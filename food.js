@@ -1,28 +1,41 @@
-import { onSnake, expandSnake } from "./snake.js"
-import { randomGridPosition } from "./grid.js"
+import { onSnake, expandSnake } from "./snake.js";
+import { randomGridPosition } from "./grid.js";
 
-let food = getRandomFoodPosition()
-const EXPANSION_RATE = 1
+let food = getRandomFoodPosition();
+const EXPANSION_RATE = 1;
+const FOOD_LIFETIME = 5000; // 5 seconds
+let foodGenerationTime;
 
-export function update(){
-    if (onSnake(food)){
-        expandSnake(EXPANSION_RATE)
-        food = getRandomFoodPosition()
+function getRandomFoodPosition() {
+    let newFoodPosition;
+    while (newFoodPosition == null || onSnake(newFoodPosition)) {
+        newFoodPosition = randomGridPosition();
     }
+    return newFoodPosition;
 }
 
-export function draw(gameBoard){
-        const foodElement = document.createElement('div')
-        foodElement.style.gridRowStart = food.y
-        foodElement.style.gridColumnStart = food.x
-        foodElement.classList.add('food')
-        gameBoard.appendChild(foodElement)
+function generateFood() {
+    food = getRandomFoodPosition();
+    foodGenerationTime = Date.now();
 }
 
-function getRandomFoodPosition(){
-    let newFoodPosition
-    while (newFoodPosition == null || onSnake(newFoodPosition)){
-        newFoodPosition = randomGridPosition()
+generateFood();
+
+export function update() {
+    if (onSnake(food)) {
+        expandSnake(EXPANSION_RATE);
+        generateFood();
+        return true; // Food was eaten
+    } else if (Date.now() - foodGenerationTime > FOOD_LIFETIME) {
+        generateFood(); 
     }
-    return newFoodPosition
+    return false; // Food was not eaten
+}
+
+export function draw(gameBoard) {
+    const foodElement = document.createElement('div');
+    foodElement.style.gridRowStart = food.y;
+    foodElement.style.gridColumnStart = food.x;
+    foodElement.classList.add('food');
+    gameBoard.appendChild(foodElement);
 }
