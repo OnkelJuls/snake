@@ -6,7 +6,7 @@ let lastRenderTime = 0;
 let gameOver = false;
 const gameBoard = document.getElementById('game-board');
 let currentScore = 0;
-let highScore = parseInt(localStorage.getItem('highScore') || 0);
+let highScore = 0;
 
 const scoreElement = document.getElementById('score');
 const highScoreElement = document.getElementById('high-score');
@@ -17,17 +17,11 @@ function updateScore() {
     scoreElement.textContent = currentScore;
 }
 
-function updateHighScore() {
-    if (currentScore > highScore) {
-        highScore = currentScore;
-        localStorage.setItem('highScore', highScore); 
-        highScoreElement.textContent = highScore;
-    }
-}
-
 function main(currentTime) {
     if (gameOver) {
-        updateHighScore();
+        if (currentScore > highScore) {
+            updateHighScoreOnServer(currentScore);
+        }
         if (confirm(`You lost. Score: ${currentScore}. Restart?`)) {
             window.location = '/';
         }
@@ -62,10 +56,52 @@ function checkDeath() {
     gameOver = outsideGrid(getSnakeHead()) || snakeIntersection();
 }
 
-highScoreElement.textContent = highScore;
+deleteHighscoreButton.addEventListener('click', async () => {
+    try {
+        const response = await fetch('/highscore', {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ highScore: 0 }) 
+        });
+        const data = await response.json();
+        console.log(data.message);
+        highScore = 0;
+        highScoreElement.textContent = highScore;
+    } catch (error) {
+        console.error("Error resetting high score:", error);
+    }
+});
 
-deleteHighscoreButton.addEventListener('click', () => {
-    localStorage.removeItem('highscore');
-    highScore = 0;
-    highScoreElement.textContent = highScore;
-})
+async function getHighScore() {
+    try {
+        const response = await fetch('/highscore');
+        const data = await response.json();
+        highScore = data.highScore;
+        highScoreElement.textContent = highScore;
+        return data.highScore;
+    } catch (error) {
+        console.error("Error fetching high score:", error);
+        return 0;
+    }
+}
+
+async function updateHighScoreOnServer(score) {
+    try {
+        const response = await fetch('/highscore', {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ highScore: score })
+        });
+        const data = await response.json();
+        console.log(data.message);
+        await getHighScore(); 
+    } catch (error) {
+        console.error("Error updating high score:", error);
+    }
+}
+
+getHighScore();

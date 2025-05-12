@@ -6,31 +6,56 @@ body{
     align-items: center;
     flex-direction: column;
     margin: 0;
-    background-color: black;
+
+    background-color: white;
+    gap: 10px;
 }
 
 #game-board{
-    background-color: #ccc;
+    background-color: #26547c;
     width: 100vmin;
     height: 100vmin;
     display: grid;
     grid-template-rows: repeat(21, 1fr);
     grid-template-columns: repeat(21, 1fr);
+    margin-bottom: 4px;
 }
 
 .snake{
-    background-color: hsl(200, 100%, 50%);
+    background-color: #ef476f;
     border: .25vmin solid black;
 }
 
 .food{
-    background-color: hsl(50, 100%, 50%);
+    background-color: #ffd166;
     border: .25vmin solid black;
 }
 
+#top-container{
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: .5rem;
+    padding: 4px;
+    background-color: #ffd166;
+    width: 40%;
+    margin-top: 4px;
+}
+#top-container button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: .5rem;
+    background-color: #ef476f;
+    color: white;
+    flex: 1;
+}
 #score-container{
     display: flex;
-    color: aqua;
+    color: #26547c;
     flex-direction: column;
     text-align: center;
+    flex: 1;
 }
